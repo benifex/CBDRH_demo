@@ -60,19 +60,26 @@ rm(dummy_data1, dummy_data2)
 tab2 <- dummy_data %>% tabyl(PARENT_SEX, N_V_EGTH) %>% 
   adorn_totals(c("col"))
 
+tab_data_colnames <- colnames(tab2)
+tab_data_colnames <- tab_data_colnames[2:length(tab_data_colnames)]
+
 # tab2 %<>% 
 #   mutate(`0_pct` = `0` / last(`0`), .after = `0`) %>% 
 #   mutate(`1_pct` = `1` / last(`1`), .after = `1`) %>% 
 #   mutate(`NA_pct` = `NA_` / last(`NA_`), .after = `NA_`) %>% 
 #   mutate(Total_pct = Total / last(Total), .after = `Total`)
 
-tab2 %<>%  pct(c("0", "1", "NA_", "Total"))
-
+# tab2 %<>% pct(c("0", "1", "NA_", "Total"))
+tab2 %<>% pct(c(tab_data_colnames))
 tab2 %<>% adorn_totals("row") 
 
 tab2 %<>% select(PARENT_SEX, "0", "0.pct", "1", "1.pct", "NA_", "NA_.pct", Total, Total.pct)
 
-tab2 %<>% adorn_pct_formatting(,,,`0.pct`, `1.pct`, `NA_.pct`, Total.pct)
+tab_pct_colnames <- tab2 %>% select(ends_with(".pct")) %>% colnames()
+
+# tab2 %<>% adorn_pct_formatting(,,, `0.pct`, `1.pct`, `NA_.pct`, Total.pct)
+tab2 %<>% adorn_pct_formatting(,,, all_of(tab_pct_colnames))
+
 
 tab2 %>% 
   mutate(PARENT_SEX = case_when(PARENT_SEX == "1" ~ "Female-male couple",
@@ -82,7 +89,7 @@ tab2 %>%
    kable(col.names = c("Intending parents", "n", "%", "n", "%","n", "%","n", "%"),
          align = "lrrrrrrrr") %>%
    kable_styling(htmltable_class = "lightable-classic-2") %>% 
-  row_spec(4, bold = T) %>% 
+  row_spec(nrow(tab2), bold = T) %>% 
   add_header_above(c(" "=1, "Fresh"=2, "Thawed"=2, "Oocyte/Embryo \n recipient"=2, "All"=2), align = "c") %>% 
   add_header_above(c(" "=1, "Autologous"=4, " "=4)) %>% 
   add_header_above(c("Table 2: Number of autologous and recipient cycles by intending parents and treatment type, Australia and New Zealand, 2021"=9), bold = TRUE, align = "l")
