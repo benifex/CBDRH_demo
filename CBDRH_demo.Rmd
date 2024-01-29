@@ -58,20 +58,25 @@ dummy_data <- right_join(dummy_data1, dummy_data2, by = "PAT_ID")
 tab2 <- dummy_data %>% tabyl(PARENT_SEX, N_V_EGTH) %>% 
   adorn_totals(c("row", "col"))
 
-tab2 %<>% mutate(
-  `0_pct` = `0` / Total,
-  `1_pct` = `1` / Total,
-  `NA_pct` = `NA_` / Total)
+tab2 %<>% 
+  mutate(`0_pct` = `0` / Total, .after = `0`) %>% 
+  mutate(`1_pct` = `1` / Total, .after = `1`) %>% 
+  mutate(`NA_pct` = `NA_` / Total, .after = `NA_`) %>% 
+  mutate(Total_pct = Total / last(Total), .after = `Total`)
 
-# col.names = c("Intending parents", "n", "n", "n", "n")
+tab2 %<>% adorn_pct_formatting(,,,`0_pct`, `1_pct`, `NA_pct`, Total_pct)
 
 tab2 %>% 
   mutate(PARENT_SEX = case_when(PARENT_SEX == "1" ~ "Female-male couple",
       PARENT_SEX == "2" ~ "Single female",
       PARENT_SEX == "3" ~ "Female-female couple",
        .default = as.character(PARENT_SEX))) %>%
-   kable() %>%
-   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+   kable(col.names = c("Intending parents", "n", "%", "n", "%","n", "%","n", "%"),
+         align = "lrrrrrrrr") %>%
+   kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>% 
+  row_spec(4, bold = T) %>% 
+  add_header_above(c(" "=1, "Fresh"=2, "Thawed"=2, "Oocyte/Embryo \n recipient"=2, "All"=2), align = "c") %>% 
+  add_header_above(c(" "=1, "Autologous"=4, " "=4))
 
 ```
 
