@@ -21,15 +21,41 @@ mk <- function(x) {
 
 ```
 
+
+```{r Create: table and kable functions for examples}
+tabl_fun <- function(tabl) {
+  tabl %<>% rename(var1 = 1) 
+  tabl %<>% adorn_totals(c("col"))
+  tab_data_colnames <- colnames(tabl)
+  tab_data_colnames <- tab_data_colnames[2:length(tab_data_colnames)]
+  tabl %<>% pct(c(tab_data_colnames))
+  tabl %<>% adorn_totals("row") 
+  tab_pct_colnames <- tabl %>% select(ends_with(".pct")) %>% colnames()
+  tabl %<>% adorn_pct_formatting(,,,all_of(c(tab_pct_colnames)))
+  tab_data_and_pct_colnames <- as.vector(rbind(tab_data_colnames,tab_pct_colnames))
+  tabl %<>% select(var1, all_of(tab_data_and_pct_colnames))
+  } 
+
+kable_tabl_fun <- function(tabl) {
+    tabl %<>% kable(col.names = c(all_of(col1), "n", "%", "n", "%","n", "%","n", "%"),
+         align = "lrrrrrrrr") %>%
+   kable_styling(htmltable_class = "lightable-classic-2", full_width = FALSE) %>% 
+    column_spec(1, width = "4cm") %>%
+    column_spec(c(2,4,6,8), width = "0.8cm") %>%
+    column_spec(c(3,5,7,9), width = "2cm") %>%
+    row_spec(0, bold = T) %>% 
+    row_spec(nrow(tabl), bold = T) %>% 
+  add_header_above(c(" "=1, "Fresh"=2, "Thawed"=2, "Oocyte/Embryo \n recipient"=2, "All"=2), align = "c", bold = TRUE) %>% 
+  add_header_above(c(" "=1, "Autologous"=4, " "=4), bold = TRUE)
+  } 
+```
+
 ```{r Create: dummy data}
 dummy_data1 <- data.frame(
   PAT_ID = c(1:56),
   PARENT_SEX = c(rep(1, 46), rep(2, 8), rep(3, 2)),
   FAGE = rnorm(56, mean = 36, sd = 3.5)
   )
-
-min(dummy_data1$FAGE)   # 26.7
-max(dummy_data1$FAGE)   # 43.6
 
 dummy_data1$FAGE[which.max(dummy_data1$FAGE)] <- 46 # max age is always 46 so all age breaks filled
 dummy_data1$FAGE[which.min(dummy_data1$FAGE)] <- 28 # min age is always 28 so all age breaks filled
@@ -63,37 +89,6 @@ dummy_data2 <- data.frame(
 dummy_data <- right_join(dummy_data1, dummy_data2, by = "PAT_ID") 
 
 rm(n_v_egth, n_v_egth1, n_v_egth2, n_v_egth3, dummy_data1, dummy_data2)   
-```
-
-```{r Create: table function for examples}
-tabl_fun <- function(tabl) {
-  tabl %<>% rename(var1 = 1) 
-  tabl %<>% adorn_totals(c("col"))
-  tab_data_colnames <- colnames(tabl)
-  tab_data_colnames <- tab_data_colnames[2:length(tab_data_colnames)]
-  tabl %<>% pct(c(tab_data_colnames))
-  tabl %<>% adorn_totals("row") 
-  tab_pct_colnames <- tabl %>% select(ends_with(".pct")) %>% colnames()
-  tabl %<>% adorn_pct_formatting(,,,all_of(c(tab_pct_colnames)))
-  tab_data_and_pct_colnames <- as.vector(rbind(tab_data_colnames,tab_pct_colnames))
-  tabl %<>% select(var1, all_of(tab_data_and_pct_colnames))
-  } 
-
-```
-
-```{r Create: kable tab function  for examples}
-kable_tabl_fun <- function(tabl) {
-    tabl %<>% kable(col.names = c(all_of(col1), "n", "%", "n", "%","n", "%","n", "%"),
-         align = "lrrrrrrrr") %>%
-   kable_styling(htmltable_class = "lightable-classic-2", full_width = FALSE) %>% 
-    column_spec(1, width = "4cm") %>%
-    column_spec(c(2,4,6,8), width = "0.8cm") %>%
-    column_spec(c(3,5,7,9), width = "2cm") %>%
-    row_spec(0, bold = T) %>% 
-    row_spec(nrow(tabl), bold = T) %>% 
-  add_header_above(c(" "=1, "Fresh"=2, "Thawed"=2, "Oocyte/Embryo \n recipient"=2, "All"=2), align = "c", bold = TRUE) %>% 
-  add_header_above(c(" "=1, "Autologous"=4, " "=4), bold = TRUE)
-  } 
 ```
 
 ```{r Create: example table 2 using function}
