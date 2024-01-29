@@ -24,8 +24,18 @@ mk <- function(x) {
 ```{r Create: dummy data}
 dummy_data1 <- data.frame(
   PAT_ID = c(1:56),
-  PARENT_SEX = c(rep(1, 46), rep(2,8), rep(3,2))
+  PARENT_SEX = c(rep(1, 46), rep(2, 8), rep(3, 2)),
+  FAGE = rnorm(56, mean = 36, sd = 3.5)
   )
+
+min(dummy_data1$FAGE)   # 26.7
+max(dummy_data1$FAGE)   # 43.6
+
+dummy_data1$FAGE[which.max(dummy_data1$FAGE)] <- 46 # max age is always 46 so all age breaks filled
+dummy_data1$FAGE[which.min(dummy_data1$FAGE)] <- 28 # min age is always 28 so all age breaks filled
+
+dummy_data1 %<>% mutate(FAGE_BIN = cut(FAGE, breaks = c(0,30,34,39,44,100), include.lowest = TRUE, labels = c("\u003c 30", "30-34", "35-39", "40-44", "\u2265 45")))
+ 
 
 # create and randomise some vectors for use in data frame
 n_v_egth1 <- c(rep(0, 53), rep(1, 36))
@@ -72,12 +82,12 @@ tabl_fun <- function(tabl) {
 
 ```
 
-```{r Create: example table using function Part 1}
+```{r Create: example table 2 using function Part 1}
 tab2 <- dummy_data %>% tabyl(PARENT_SEX, N_V_EGTH) %>% tabl_fun() 
 
 ```
 
-```{r Create: example table using function Part 2}
+```{r Create: example table 2 using function Part 2}
 tab2 %>% 
   mutate(var1 = case_when(var1 == "1" ~ "Female-male couple",
       var1 == "2" ~ "Single female",
@@ -96,6 +106,28 @@ tab2 %>%
   add_header_above(c(" "=1, "Autologous"=4, " "=4), bold = TRUE) %>% 
   add_header_above(c("Table 2: Number of autologous and recipient cycles by intending parents and treatment type, Australia and New Zealand, 2021"=9), bold = TRUE, align = "l")  
 
+```
+
+```{r Create: example table 3 using function Part 1}
+tab3 <- dummy_data %>% tabyl(FAGE_BIN, N_V_EGTH) %>% tabl_fun() 
+
+```
+
+```{r Create: example table 3 using function Part 2}
+tab3 %>% 
+   kable(col.names = c("Age group (years) (a)", "n", "%", "n", "%","n", "%","n", "%"),
+         align = "lrrrrrrrr") %>%
+   kable_styling(htmltable_class = "lightable-classic-2",
+                 full_width = FALSE) %>% 
+    column_spec(1, width = "4cm") %>%
+    column_spec(c(2,4,6,8), width = "0.8cm") %>%
+    column_spec(c(3,5,7,9), width = "2cm") %>%
+    row_spec(0, bold = T) %>% 
+    row_spec(nrow(tab3), bold = T) %>% 
+  add_header_above(c(" "=1, "Fresh"=2, "Thawed"=2, "Oocyte/Embryo \n recipient"=2, "All"=2), align = "c", bold = TRUE) %>% 
+  add_header_above(c(" "=1, "Autologous"=4, " "=4), bold = TRUE) %>% 
+  add_header_above(c("Table 3: Number of autologous and recipient cycles by female patient age and treatment type, Australia and New Zealand, 2021"=9), bold = TRUE, align = "l") %>% 
+  footnote(c("(a) Age at start of a treatment cycle.", "Data are collected for each treatment cycle; therefore, some individuals may be counted more than once."))
 ```
 
 
