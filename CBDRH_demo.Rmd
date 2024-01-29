@@ -8,6 +8,26 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(janitor)
 
 ```
+
+```{r Create: dummy data}
+dummy_data1 <- data.frame(
+  PARENT_SEX = c(rep(1, 46), rep(2,8), rep(3,2)))
+  
+
+# N_S_EGTH = c(rep(0,44), rep(1,2), rep())
+#   )
+
+```
+
+```{r Create: example table}
+
+```
+
+
 
