@@ -68,9 +68,11 @@ tab2 <- dummy_data %>% tabyl(PARENT_SEX, N_V_EGTH) %>%
 
 tab2 %<>%  pct(c("0", "1", "NA_", "Total"))
 
+tab2 %<>% adorn_totals("row") 
+
 tab2 %<>% select(PARENT_SEX, "0", "0.pct", "1", "1.pct", "NA_", "NA_.pct", Total, Total.pct)
 
-tab2 %<>% adorn_pct_formatting(,,,`0_pct`, `1_pct`, `NA_pct`, Total_pct)
+tab2 %<>% adorn_pct_formatting(,,,`0.pct`, `1.pct`, `NA_.pct`, Total.pct)
 
 tab2 %>% 
   mutate(PARENT_SEX = case_when(PARENT_SEX == "1" ~ "Female-male couple",
