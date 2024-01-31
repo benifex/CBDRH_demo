@@ -31,13 +31,13 @@ tabl_fun <- function(tabl) {
   tabl %<>% pct(c(tab_data_colnames))
   tabl %<>% adorn_totals("row") 
   tab_pct_colnames <- tabl %>% select(ends_with(".pct")) %>% colnames()
-  tabl %<>% adorn_pct_formatting(,,,all_of(c(tab_pct_colnames)))            # need to remove all_of()
+  tabl %<>% adorn_pct_formatting(,,,c(tab_pct_colnames))            # need to remove all_of()
   tab_data_and_pct_colnames <- as.vector(rbind(tab_data_colnames,tab_pct_colnames))
-  tabl %<>% select(var1, all_of(tab_data_and_pct_colnames))                 # remove all_of()
+  tabl %<>% select(var1, c(tab_data_and_pct_colnames))                 # remove all_of()
   } 
 
 kable_tabl_fun <- function(tabl) {
-    tabl %<>% kable(col.names = c(all_of(col1), "n", "%", "n", "%","n", "%","n", "%"),
+    tabl %<>% kable(col.names = c(col1, "n", "%", "n", "%","n", "%","n", "%"),
          align = "lrrrrrrrr") %>%
    kable_styling(htmltable_class = "lightable-classic-2", full_width = FALSE) %>% 
     column_spec(1, width = "4cm") %>%
